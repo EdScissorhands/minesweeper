@@ -3,15 +3,19 @@ require 'colorize'
 
 class Board
 
-  attr_accessor :grid
+  attr_accessor :grid, :number_revealed_tiles
 
   def initialize(size)
-    @grid = generate_grid(size)
+    @size = size
+    @number_revealed_tiles = 0
+    @grid = generate_grid(@size)
     assign_values
   end
 
   def generate_grid(size)
-    tiles = Tile.generate_tiles(size)
+    @number_of_bombs = size
+    tiles = Tile.generate_tiles(size, @number_of_bombs)
+    # @unrevealed tiles = dup
     Array.new(size) { Array.new(size) { tiles.pop } }
   end
 
@@ -51,7 +55,8 @@ class Board
     grid.each_with_index do |row, idx|
       print "#{idx} ".light_blue
       row.each do |tile|
-        print tile.flagged ? "f" : !tile.revealed ? "#" : tile.value > 0 ? tile.value : " "
+        # TODO: plzgod refactor this
+        print tile.flagged ? "f" : !tile.revealed ? "#" : tile.bomb ? "*" : tile.value > 0 ? tile.value : " "
         print " "
       end
       puts
@@ -63,13 +68,17 @@ class Board
   end
 
   def reveal(pos)
-    p pos
     # return if self[pos].flagged
+    @number_revealed_tiles += 1
     current_tile = self[pos]
     current_tile.reveal
     if current_tile.value == 0
       neighbor_positions(pos).each { |new_pos| reveal(new_pos) unless self[new_pos].revealed }
     end
+  end
+
+  def won?
+    @number_revealed_tiles == (@size ** 2) - @number_of_bombs
   end
 
   def [](pos)

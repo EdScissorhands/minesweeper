@@ -39,11 +39,12 @@ class Game
 
   def run
     play_turn until over?
-    # print win or lose
+    board.render
+    puts (board.won? ? "Woooo you won!" : "God you suck.")
   end
 
   def over?
-    # see if its done
+    board.won? || board.lost
   end
 
   def valid_pos?(pos)

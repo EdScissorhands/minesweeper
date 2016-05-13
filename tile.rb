@@ -9,10 +9,10 @@ class Tile
     @revealed = false
   end
 
-  def self.generate_tiles(size)
+  def self.generate_tiles(size, bombs)
     tiles = []
     (size ** 2).times do |i|
-      bomb = (i < size/2 ? true : false)
+      bomb = (i < bombs ? true : false)
       tiles << Tile.new(bomb)
     end
     tiles.shuffle
